@@ -1,0 +1,21 @@
+# Email authentication records — to add via Cloudflare DNS
+# Added Sep 5 2026 for bulletproof hardening
+
+# 1. SPF — already exists, but strengthen to hardfail
+# Current: "v=spf1 include:zohomail.eu include:resend.com ~all"
+# Replace with: "v=spf1 include:zohomail.eu include:resend.com -all"
+
+sikrits.com  TXT  "v=spf1 include:zohomail.eu include:resend.com -all"
+
+# 2. DMARC — NEW
+_dmarc.sikrits.com  TXT  "v=DMARC1; p=quarantine; rua=mailto:info@sikrits.com; pct=100; adkim=s; aspf=s"
+
+# 3. DKIM — Zoho specific (get from Zoho admin panel)
+# Zoho Mail → Settings → Domains → sikrits.com → DKIM
+# It will give you a TXT record like:
+# zmail._domainkey.sikrits.com  TXT  "v=DKIM1; k=rsa; p=MIGfMA0GCSq..."
+
+# 4. CAA — restrict certificate issuance to Let's Encrypt
+sikrits.com  CAA 0 issue "letsencrypt.org"
+sikrits.com  CAA 0 issuewild "letsencrypt.org"
+sikrits.com  CAA 0 iodef "mailto:info@sikrits.com"
